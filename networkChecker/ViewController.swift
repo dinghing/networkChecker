@@ -13,6 +13,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var url: UITextField!
     @IBOutlet weak var result: UITextField!
     
+    @IBOutlet weak var resultOfreachable: UITextField!
     @IBOutlet weak var detail: UILabel!
     @IBAction func confirmNetwork(_ sender: Any) {
         // Do any additional setup after loading the view.
@@ -26,10 +27,19 @@ class ViewController: UIViewController {
             print("can not access the internet")
         }
         
+         if Reachability.isConnectedToNetwork() {
+            print("We're online!")
+            resultOfreachable.text = "can access the internet"
+         }
+         else{
+            print("We're offline!")
+            resultOfreachable.text = "cannot access the internet"
+        }
+        
         let address = getIFAddresses()
-        print(address)
+        //print(address)
         for str in address{
-            print(str)
+            //print(str)
             detail.text! += str
         }
     }
