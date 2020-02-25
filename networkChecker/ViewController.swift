@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Network
 
 class ViewController: UIViewController {
 
@@ -27,7 +28,28 @@ class ViewController: UIViewController {
             print("can not access the internet")
         }
         
-         if Reachability.isConnectedToNetwork() {
+//         if Reachability.isConnectedToNetwork() {
+//            print("We're online!")
+//            resultOfreachable.text = "can access the internet"
+//         }
+//         else{
+//            print("We're offline!")
+//            resultOfreachable.text = "cannot access the internet"
+//        }
+//
+//        let address = getIFAddresses()
+//        //print(address)
+//        for str in address{
+//            //print(str)
+//            detail.text! += str
+//        }
+        guard let address = getAddress(for: .vpn) else
+        {
+            print("there is no vpn info")
+            return
+            
+        }
+        if CheckReachability(address: address){
             print("We're online!")
             resultOfreachable.text = "can access the internet"
          }
@@ -35,13 +57,7 @@ class ViewController: UIViewController {
             print("We're offline!")
             resultOfreachable.text = "cannot access the internet"
         }
-        
-        let address = getIFAddresses()
-        //print(address)
-        for str in address{
-            //print(str)
-            detail.text! += str
-        }
+        detail.text = address
     }
         
     override func viewDidLoad() {
@@ -59,39 +75,45 @@ class ViewController: UIViewController {
         //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
     }
-//    func getAddress(for network: Network) -> String? {
-//        var address: String?
-//
-//        // Get list of all interfaces on the local machine:
-//        var ifaddr: UnsafeMutablePointer<ifaddrs>?
-//        guard getifaddrs(&ifaddr) == 0 else { return nil }
-//        guard let firstAddr = ifaddr else { return nil }
-//
-//        // For each interface ...
-//        for ifptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
-//            let interface = ifptr.pointee
-//
-//            // Check for IPv4 or IPv6 interface:
-//            let addrFamily = interface.ifa_addr.pointee.sa_family
-//            if addrFamily == UInt8(AF_INET) || addrFamily == UInt8(AF_INET6) {
-//
-//                // Check interface name:
-//                let name = String(cString: interface.ifa_name)
-//                if name == network.rawValue {
-//
-//                    // Convert interface address to a human readable string:
-//                    var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-//                    getnameinfo(interface.ifa_addr, socklen_t(interface.ifa_addr.pointee.sa_len),
-//                                &hostname, socklen_t(hostname.count),
-//                                nil, socklen_t(0), NI_NUMERICHOST)
-//                    address = String(cString: hostname)
-//                }
-//            }
-//        }
-//        freeifaddrs(ifaddr)
-//
-//        return address
-//    }
+    
+    enum Network: String {
+        case wifi = "en0"
+        case cellular = "pdp_ip0"
+        case vpn = "utun0"
+    }
+    
+    func getAddress(for network: Network) -> String? {
+        var address: String?
+
+        // Get list of all interfaces on the local machine:
+        var ifaddr: UnsafeMutablePointer<ifaddrs>?
+        guard getifaddrs(&ifaddr) == 0 else { return nil }
+        guard let firstAddr = ifaddr else { return nil }
+
+        // For each interface ...
+        for ifptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
+            let interface = ifptr.pointee
+
+            // Check for IPv4 or IPv6 interface:
+            let addrFamily = interface.ifa_addr.pointee.sa_family
+            if addrFamily == UInt8(AF_INET) || addrFamily == UInt8(AF_INET6) {
+
+                // Check interface name:
+                let name = String(cString: interface.ifa_name)
+                if name == network.rawValue {
+
+                    // Convert interface address to a human readable string:
+                    var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                    getnameinfo(interface.ifa_addr, socklen_t(interface.ifa_addr.pointee.sa_len),
+                                &hostname, socklen_t(hostname.count),
+                                nil, socklen_t(0), NI_NUMERICHOST)
+                    address = String(cString: hostname)
+                }
+            }
+        }
+        freeifaddrs(ifaddr)
+        return address
+    }
     
     
     func getIFAddresses() -> [String] {
