@@ -25,10 +25,20 @@ func CheckReachability(hostname:String)->Bool{
 }
 
 func CheckReachability(address:String)->Bool{
+    //ipv6
+    var addr6 = sockaddr_in6()
+    addr6.sin6_len = UInt8(MemoryLayout.size(ofValue: addr6))
+    addr6.sin6_family = sa_family_t(AF_INET6)
+    var ip = in6_addr()
+    _ = withUnsafeMutablePointer(to: &ip) {
+        inet_pton(AF_INET6, address, UnsafeMutablePointer($0))
+    }
+    addr6.sin6_addr = ip
+    
+    //ipv4
     var addr = sockaddr_in()
     addr.sin_len = UInt8(MemoryLayout.size(ofValue: addr))
     addr.sin_family = sa_family_t(AF_INET)
-    //addr.sin_addr.s_addr = inet_addr("8.8.8.8")
     addr.sin_addr.s_addr = inet_addr(address)
     
     var hostaddr = sockaddr_in()
@@ -42,7 +52,7 @@ func CheckReachability(address:String)->Bool{
         }
     }
     
-    guard let reachability = withUnsafePointer(to: &addr, {
+    guard let reachability = withUnsafePointer(to: &addr6, {
         $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
             SCNetworkReachabilityCreateWithAddressPair(kCFAllocatorDefault, $0, hostAddress)
         }

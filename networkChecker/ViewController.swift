@@ -36,7 +36,7 @@ class ViewController: UIViewController {
 //            resultOfreachable.text = "cannot access the internet"
 //        }
 //
-//        let address = getIFAddresses()
+        let _ = getIFAddresses()
 //        //print(address)
 //        for str in address{
 //            //print(str)
@@ -80,7 +80,6 @@ class ViewController: UIViewController {
     
     func getAddress(for network: Network) -> String? {
         var address: String?
-
         // Get list of all interfaces on the local machine:
         var ifaddr: UnsafeMutablePointer<ifaddrs>?
         guard getifaddrs(&ifaddr) == 0 else { return nil }
@@ -97,7 +96,6 @@ class ViewController: UIViewController {
                 // Check interface name:
                 let name = String(cString: interface.ifa_name)
                 if name == network.rawValue {
-
                     // Convert interface address to a human readable string:
                     var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                     getnameinfo(interface.ifa_addr, socklen_t(interface.ifa_addr.pointee.sa_len),
@@ -140,6 +138,7 @@ class ViewController: UIViewController {
         }
 
         freeifaddrs(ifaddr)
+        print(addresses)
         return addresses
     }
 }
