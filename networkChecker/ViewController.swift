@@ -27,7 +27,6 @@ class ViewController: UIViewController {
             result.text = "can not access the internet" + url.text!
             print("can not access the internet")
         }
-        
 //         if Reachability.isConnectedToNetwork() {
 //            print("We're online!")
 //            resultOfreachable.text = "can access the internet"
@@ -43,11 +42,10 @@ class ViewController: UIViewController {
 //            //print(str)
 //            detail.text! += str
 //        }
-        guard let address = getAddress(for: .vpn) else
+        
+        guard let address = getAddress(for: .cellular) else
         {
-            print("there is no vpn info")
             return
-            
         }
         if CheckReachability(address: address){
             print("We're online!")
@@ -59,15 +57,13 @@ class ViewController: UIViewController {
         }
         detail.text = address
     }
-        
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         detail.numberOfLines = 0
         //Looks for single or multiple taps.
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
-
         view.addGestureRecognizer(tap)
-
     }
 
     //Calls this function when the tap is recognized.
@@ -79,7 +75,7 @@ class ViewController: UIViewController {
     enum Network: String {
         case wifi = "en0"
         case cellular = "pdp_ip0"
-        case vpn = "utun0"
+        case vpn = "utun0" //
     }
     
     func getAddress(for network: Network) -> String? {
@@ -114,7 +110,6 @@ class ViewController: UIViewController {
         freeifaddrs(ifaddr)
         return address
     }
-    
     
     func getIFAddresses() -> [String] {
         var addresses = [String]()

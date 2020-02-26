@@ -20,35 +20,45 @@ func CheckReachability(hostname:String)->Bool{
     
     let isReachable = (flags.rawValue & UInt32(kSCNetworkFlagsReachable)) != 0
     let needsConnection = (flags.rawValue & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
-    
+    print(UInt32(kSCNetworkFlagsReachable))
     return (isReachable && !needsConnection)
 }
 
 func CheckReachability(address:String)->Bool{
-//    var addr = sockaddr_in()
-//    addr.sin_len = UInt8(MemoryLayout.size(ofValue: addr))
-//    addr.sin_family = sa_family_t(AF_INET)
-//    addr.sin_addr.s_addr = inet_addr("10.40.106.37")
+    var addr = sockaddr_in()
+    addr.sin_len = UInt8(MemoryLayout.size(ofValue: addr))
+    addr.sin_family = sa_family_t(AF_INET)
+    //addr.sin_addr.s_addr = inet_addr("8.8.8.8")
+    addr.sin_addr.s_addr = inet_addr(address)
     
-    var zeroAddress = sockaddr_in(sin_len: 0, sin_family: sa_family_t(AF_INET), sin_port: 0, sin_addr: in_addr(s_addr: inet_addr("10.40.106.37")), sin_zero: (0, 0, 0, 0, 0, 0, 0, 0))
-    zeroAddress.sin_len = UInt8(MemoryLayout.size(ofValue: zeroAddress))
-    zeroAddress.sin_family = sa_family_t(AF_INET)
+    var hostaddr = sockaddr_in()
+    hostaddr.sin_len = UInt8(MemoryLayout.size(ofValue: hostaddr))
+    hostaddr.sin_family = sa_family_t(AF_INET)
+    hostaddr.sin_addr.s_addr = inet_addr("8.8.8.8")
     
-    guard let reachability = withUnsafePointer(to: &zeroAddress, {
+    let hostAddress = withUnsafePointer(to: &hostaddr) {
         $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
-            SCNetworkReachabilityCreateWithAddressPair(kCFAllocatorNull, $0, nil)
+            return $0
+        }
+    }
+    
+    guard let reachability = withUnsafePointer(to: &addr, {
+        $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+            SCNetworkReachabilityCreateWithAddressPair(kCFAllocatorDefault, $0, hostAddress)
         }
     })else{
-        print("the addressPair is none")
         return false
     }
 
     var flags = SCNetworkReachabilityFlags.connectionAutomatic
+    
     if !SCNetworkReachabilityGetFlags(reachability, &flags){
         return false
     }
 
-    let isReachable = (flags.rawValue & UInt32(kSCNetworkFlagsReachable)) != 0
+    let isReachable = flags.contains(.reachable)
+    print("isReachable is ",isReachable)
+   // let isReachable = (flags.rawValue & UInt32(kSCNetworkFlagsReachable)) != 0
     let needsConnection = (flags.rawValue & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
     
     return (isReachable && !needsConnection)
@@ -67,8 +77,9 @@ public class Reachability {
             return false
         }
         
-        var flags: SCNetworkReachabilityFlags = SCNetworkReachabilityFlags(rawValue: 0)
-        
+        var flags: SCNetworkReachabilityFlags = SCNetworkReachabilityFlags.connectionAutomatic
+        print("isConnectedToNetwork of flag is",flags.rawValue)
+
         if SCNetworkReachabilityGetFlags(defaultRouteReachability , &flags) == false {
             return false
         }
@@ -77,6 +88,8 @@ public class Reachability {
         
         let needsConnection = flags == .connectionRequired
         
+        let out = flags.subtracting(.reachable)
+        print("out is ",out)
         print(isReachable)
         return isReachable && !needsConnection
     }

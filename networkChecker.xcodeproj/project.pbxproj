@@ -16,6 +16,7 @@
 		36891FE423E7F2860035EAD1 /* networkCheckerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36891FE323E7F2860035EAD1 /* networkCheckerUITests.swift */; };
 		36891FF323E805AB0035EAD1 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36891FF223E805AB0035EAD1 /* SystemConfiguration.framework */; };
 		36891FF523E806530035EAD1 /* CheckReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36891FF423E806530035EAD1 /* CheckReachability.swift */; };
+		36C437F62405FF71003282AA /* NetStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36C437F52405FF71003282AA /* NetStatus.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		36891FE523E7F2860035EAD1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		36891FF223E805AB0035EAD1 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		36891FF423E806530035EAD1 /* CheckReachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckReachability.swift; sourceTree = "<group>"; };
+		36C437F52405FF71003282AA /* NetStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetStatus.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +84,7 @@
 		36891FB723E7F2750035EAD1 = {
 			isa = PBXGroup;
 			children = (
+				36C437F52405FF71003282AA /* NetStatus.swift */,
 				36891FC223E7F2760035EAD1 /* networkChecker */,
 				36891FD723E7F2850035EAD1 /* networkCheckerTests */,
 				36891FE223E7F2850035EAD1 /* networkCheckerUITests */,
@@ -272,6 +275,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				36891FC623E7F2760035EAD1 /* ViewController.swift in Sources */,
+				36C437F62405FF71003282AA /* NetStatus.swift in Sources */,
 				36891FF523E806530035EAD1 /* CheckReachability.swift in Sources */,
 				36891FC423E7F2760035EAD1 /* AppDelegate.swift in Sources */,
 			);
