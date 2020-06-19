@@ -46,11 +46,21 @@ func CheckReachability(address:String)->Bool{
     hostaddr.sin_family = sa_family_t(AF_INET)
     hostaddr.sin_addr.s_addr = inet_addr("8.8.8.8")
     
-    let hostAddress = withUnsafePointer(to: &hostaddr) {
+    var hostaddr6 = sockaddr_in6()
+    hostaddr6.sin6_len = UInt8(MemoryLayout.size(ofValue: hostaddr6))
+    hostaddr6.sin6_family = sa_family_t(AF_INET6)
+    var ip6 = in6_addr()
+    _ = withUnsafeMutablePointer(to: &ip6) {
+        inet_pton(AF_INET6,"2001:4860:4860::8888", UnsafeMutablePointer($0))
+    }
+    hostaddr6.sin6_addr = ip6
+    
+    let hostAddress = withUnsafePointer(to: &hostaddr6) {
         $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
             return $0
         }
     }
+    print(hostAddress)
     
     guard let reachability = withUnsafePointer(to: &addr6, {
         $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
@@ -68,7 +78,6 @@ func CheckReachability(address:String)->Bool{
 
     let isReachable = flags.contains(.reachable)
     print("isReachable is ",isReachable)
-   // let isReachable = (flags.rawValue & UInt32(kSCNetworkFlagsReachable)) != 0
     let needsConnection = (flags.rawValue & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
     
     return (isReachable && !needsConnection)
